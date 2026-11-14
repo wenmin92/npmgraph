@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow -- the `error` function and its parameters share a name */
 import Bugsnag from '@bugsnag/js';
 import HttpError from './HttpError.ts';
 

@@ -1,6 +1,6 @@
 import { type HTMLProps, useId, useRef, useState } from 'react';
 import { PARAM_QUERY, SEARCH_FIELD_ID } from '../../lib/constants.ts';
-import { isDefined } from '../../lib/guards.ts';
+import { parseCommaList } from '../../lib/array-util.ts';
 import { cn } from '../../lib/dom.ts';
 import { getCachedModule, QueryType } from '../../lib/ModuleCache.ts';
 import { searchSet } from '../../lib/url-util.ts';
@@ -42,10 +42,7 @@ export default function QueryInput({
   const { value } = valueState;
 
   function getSearchParameters() {
-    let moduleKeys = inputRef
-      .current!.value.split(',')
-      .map(v => v.trim())
-      .filter(item => isDefined(item));
+    let moduleKeys = parseCommaList(inputRef.current!.value);
 
     moduleKeys = [...new Set(moduleKeys)]; // De-dupe
     return searchSet(PARAM_QUERY, moduleKeys.join(', '));
@@ -60,14 +57,14 @@ export default function QueryInput({
   }
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const { value } = event.target;
-    setValueState({ query, inputValue, value });
+    const { value: newValue } = event.target;
+    setValueState({ query, inputValue, value: newValue });
     if (!isHeader) {
       return;
     }
 
     // Until submitted, highlight the matches of the whole field in the graph
-    const filter = value.trim() === inputValue ? '' : value.trim();
+    const filter = newValue.trim() === inputValue ? '' : newValue.trim();
     setGraphSelection(filter ? QueryType.Search : QueryType.Default, filter);
   }
 
